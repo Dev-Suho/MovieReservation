@@ -5,18 +5,38 @@ public class Movie {
 	private String m_poster;
 	private int m_price;
 	private int m_runningTime;
+	private String m_startDay;
 	private String m_startTime;
-	private String m_endTime;
+	private String m_theater;
+	private int m_count;
 	
+	public int getM_count() {
+		return m_count;
+	}
+
+	public void setM_count(int m_count) {
+		this.m_count += m_count;
+	}
+
 	public Movie() {}
 	
-	public Movie(String m_name,String m_poster, int m_price, int m_runningTime, String m_startTime, String m_endTime ) {
+	public Movie(String m_name,String m_poster, int m_price, int m_runningTime, String m_startTime, String m_startDay, String m_theater, int m_count ) {
 		this.m_name = m_name;
 		this.m_poster = m_poster;
 		this.m_price = m_price;
 		this.m_runningTime = m_runningTime;
 		this.m_startTime = m_startTime;
-		this.m_endTime = m_endTime;
+		this.m_startDay = m_startDay;
+		this.m_theater = m_theater;
+		this.m_count = m_count;
+	}
+
+	public String getM_theater() {
+		return m_theater;
+	}
+
+	public void setM_theater(String m_theater) {
+		this.m_theater = m_theater;
 	}
 
 	public String getM_name() {
@@ -59,11 +79,11 @@ public class Movie {
 		this.m_startTime = m_startTime;
 	}
 
-	public String getM_endTime() {
-		return m_endTime;
+	public String getM_startDay() {
+		return m_startDay;
 	}
 
-	public void setM_endTime(String m_endTime) {
-		this.m_endTime = m_endTime;
+	public void setM_startDay(String m_startDay) {
+		this.m_startDay = m_startDay;
 	}
 }

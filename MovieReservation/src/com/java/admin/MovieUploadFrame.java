@@ -6,16 +6,20 @@ import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.java.dao.MovieDAO;
 import com.java.dto.Movie;
@@ -24,7 +28,11 @@ import com.java.login.LoginFrame;
 public class MovieUploadFrame extends JFrame{
 
 	private JFrame frame;
-	
+	private String fileName;
+	private File image_save = null;
+	private String filePath;
+	private File savePath = null;
+	private String imgSaveName;
 	public MovieUploadFrame() {
 		this(null);
 	}
@@ -62,7 +70,7 @@ public class MovieUploadFrame extends JFrame{
 		
 		JLabel moviePriceLabel = new JLabel("가격 :");
 		moviePriceLabel.setFont(new Font("맑은 고딕", Font.BOLD, 15));
-		moviePriceLabel.setBounds(450, 250, 100, 25);
+		moviePriceLabel.setBounds(445, 250, 100, 25);
 		movieUploadPanel.add(moviePriceLabel);
 		
 		JTextField moviePriceField = new JTextField();
@@ -70,7 +78,17 @@ public class MovieUploadFrame extends JFrame{
 		moviePriceField.setBounds(500, 250, 100, 25);
 		movieUploadPanel.add(moviePriceField);
 		
-		JLabel movieRunningTimeLabel = new JLabel("상영 시간 :");
+		JLabel movieReserveLabel = new JLabel("예매 횟수 :");
+		movieReserveLabel.setFont(new Font("맑은 고딕", Font.BOLD, 15));
+		movieReserveLabel.setBounds(620, 250, 100, 25);
+		movieUploadPanel.add(movieReserveLabel);
+		
+		JTextField movieReserveField = new JTextField();
+		movieReserveField.setFont(new Font("맑은 고딕", Font.BOLD, 15));
+		movieReserveField.setBounds(700, 250, 100, 25);
+		movieUploadPanel.add(movieReserveField);
+		
+		JLabel movieRunningTimeLabel = new JLabel("러닝 타임 :");
 		movieRunningTimeLabel.setFont(new Font("맑은 고딕", Font.BOLD, 15));
 		movieRunningTimeLabel.setBounds(400, 350, 100, 25);
 		movieUploadPanel.add(movieRunningTimeLabel);
@@ -80,25 +98,35 @@ public class MovieUploadFrame extends JFrame{
 		movieRunningTimeField.setBounds(500, 350, 100, 25);
 		movieUploadPanel.add(movieRunningTimeField);
 		
-		JLabel movieStartTimeLabel = new JLabel("상영 날짜 :");
+		JLabel movieTheaterLabel = new JLabel("상영관(A,B,C) :");
+		movieTheaterLabel.setFont(new Font("맑은 고딕", Font.BOLD, 15));
+		movieTheaterLabel.setBounds(610, 350, 130, 25);
+		movieUploadPanel.add(movieTheaterLabel);
+		
+		JTextField movieTheaterField = new JTextField();
+		movieTheaterField.setFont(new Font("맑은 고딕", Font.BOLD, 15));
+		movieTheaterField.setBounds(720, 350, 100, 25);
+		movieUploadPanel.add(movieTheaterField);
+		
+		JLabel movieStartDayLabel = new JLabel("상영 날짜 :");
+		movieStartDayLabel.setFont(new Font("맑은 고딕", Font.BOLD, 15));
+		movieStartDayLabel.setBounds(400, 450, 100, 25);
+		movieUploadPanel.add(movieStartDayLabel);
+		
+		JTextField movieStartDayField = new JTextField();
+		movieStartDayField.setFont(new Font("맑은 고딕 ", Font.BOLD, 15));
+		movieStartDayField.setBounds(500, 450, 100, 25);
+		movieUploadPanel.add(movieStartDayField);
+		
+		JLabel movieStartTimeLabel = new JLabel("상영 시간 :");
 		movieStartTimeLabel.setFont(new Font("맑은 고딕", Font.BOLD, 15));
-		movieStartTimeLabel.setBounds(400, 450, 100, 25);
+		movieStartTimeLabel.setBounds(620, 450, 100, 25);
 		movieUploadPanel.add(movieStartTimeLabel);
 		
 		JTextField movieStartTimeField = new JTextField();
-		movieStartTimeField.setFont(new Font("맑은 고딕 ", Font.BOLD, 15));
-		movieStartTimeField.setBounds(500, 450, 100, 25);
+		movieStartTimeField.setFont(new Font("맑은 고딕", Font.BOLD, 15));
+		movieStartTimeField.setBounds(700, 450, 100, 25);
 		movieUploadPanel.add(movieStartTimeField);
-		
-		JLabel movieEndTimeLabel = new JLabel("종영 날짜 :");
-		movieEndTimeLabel.setFont(new Font("맑은 고딕", Font.BOLD, 15));
-		movieEndTimeLabel.setBounds(620, 450, 100, 25);
-		movieUploadPanel.add(movieEndTimeLabel);
-		
-		JTextField movieEndTimeField = new JTextField();
-		movieEndTimeField.setFont(new Font("맑은 고딕", Font.BOLD, 15));
-		movieEndTimeField.setBounds(700, 450, 100, 25);
-		movieUploadPanel.add(movieEndTimeField);
 		
 		JButton movieUploadButton = new JButton("영화 업로드");
 		movieUploadButton.setFont(new Font("맑은 고딕", Font.BOLD, 15));
@@ -109,6 +137,16 @@ public class MovieUploadFrame extends JFrame{
 		moviePosterLabel.setFont(new Font("맑은 고딕", Font.BOLD, 15));
 		moviePosterLabel.setBounds(160, 100, 100, 25);
 		movieUploadPanel.add(moviePosterLabel);
+		
+		JLabel moviePosterPrintLabel = new JLabel();
+		//moviePosterPrintLabel.setIcon(new ImageIcon(filePath));
+		moviePosterPrintLabel.setBounds(70, 140, 230, 342);
+		movieUploadPanel.add(moviePosterPrintLabel);
+		
+		JButton beforeFrameButton = new JButton("이전화면");
+		beforeFrameButton.setFont(new Font("맑은 고딕", Font.BOLD, 15));
+		beforeFrameButton.setBounds(50, 30, 100, 25);
+		movieUploadPanel.add(beforeFrameButton);
 		
 		// 이미지 저장
 		JButton moviePosterButton = new JButton("포스터 찾기");
@@ -121,28 +159,26 @@ public class MovieUploadFrame extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				FileDialog dialog = new FileDialog(frame, "이미지 저장", FileDialog.LOAD);
-				dialog.setDirectory(".");	// .은 지금폴더
-				dialog.setVisible(true);		
-				if(dialog.getFile() == null) return;	// 비정상 종료
+				JFileChooser movieImageChooser = new JFileChooser();
+				movieImageChooser.setDialogTitle("영화 포스터 이미지 불러오기");
+				int returnVal = movieImageChooser.showOpenDialog(frame);
 				
-				String filePath = dialog.getDirectory() + dialog.getFile();
+				if(returnVal == JFileChooser.APPROVE_OPTION) {
+				filePath = movieImageChooser.getSelectedFile().getPath();
+				fileName = movieImageChooser.getSelectedFile().getName();
+				image_save = new File(filePath);
+				
+				System.out.println(fileName);
 				System.out.println(filePath);
-				ImageIcon movieImage = new ImageIcon(filePath);
-				JLabel moivePosterPrintLabel = new JLabel(movieImage);
-				moivePosterPrintLabel.setFont(new Font("맑은 고딕", Font.BOLD, 15));
-				moivePosterPrintLabel.setBounds(70, 140, 230, 342);
-				movieUploadPanel.add(moivePosterPrintLabel);
+				System.out.println(image_save);
+				moviePosterPrintLabel.setIcon(new ImageIcon(filePath));
 				/*
-				try {
-				File moviePoster = new File(filePath);
-				FileInputStream fis = new FileInputStream(moviePoster);
-				}
-				catch (Exception e1) {
-					e1.printStackTrace();
-					System.out.println("FileInputStream 오류");
-				}
+				JLabel moviePosterPrintLabel = new JLabel();
+				moviePosterPrintLabel.setIcon(new ImageIcon(filePath));
+				moviePosterPrintLabel.setBounds(70, 140, 230, 342);
+				movieUploadPanel.add(moviePosterPrintLabel);
 				*/
+				}
 			}
 		});	
 		
@@ -150,15 +186,36 @@ public class MovieUploadFrame extends JFrame{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				JFileChooser movieImageChooser = new JFileChooser();
+				movieImageChooser.setAcceptAllFileFilterUsed(false);
+				movieImageChooser.setMultiSelectionEnabled(false);
+				movieImageChooser.setFileFilter(new FileNameExtensionFilter("JPG", "JPG"));
+				
+				
+				try {
+					BufferedImage bufferImage = ImageIO.read(image_save);
+					savePath = new File("images/"+fileName);
+					ImageIO.write(bufferImage, "jpg", savePath);
+				
+				} catch (Exception e2) {
+					e2.printStackTrace();
+					System.out.println("JFileChooser 오류");
+					JOptionPane.showMessageDialog(null, "영화 업로드 실패");
+				}
+				
 				Movie movie = new Movie();
 				movie.setM_name(movieNameField.getText());
-				movie.setM_poster(movieNameField.getText());	// 고칠부분
+				movie.setM_poster(fileName);
+				System.out.println(fileName);
 				int m_price = Integer.parseInt(moviePriceField.getText());
 				movie.setM_price(m_price);
 				int m_runningTime = Integer.parseInt(movieRunningTimeField.getText());
 				movie.setM_runningTime(m_runningTime);
+				movie.setM_startDay(movieStartDayField.getText());
 				movie.setM_startTime(movieStartTimeField.getText());
-				movie.setM_endTime(movieEndTimeField.getText());
+				movie.setM_theater(movieTheaterField.getText());
+				int m_count = Integer.parseInt(movieReserveField.getText());
+				movie.setM_count(m_count);
 				
 				MovieDAO dao = MovieDAO.getInstance();
 				int result = dao.movieUpload(movie);
@@ -170,8 +227,15 @@ public class MovieUploadFrame extends JFrame{
 					JOptionPane.showMessageDialog(null, "영화 업로드 실패");
 					dispose();
 				}
+			}
+		});
+		
+		beforeFrameButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
 				frame.dispose();
-				LoginFrame frame = new LoginFrame();
+				MovieManagementFrame frame = new MovieManagementFrame(id);
 			}
 		});
 	}

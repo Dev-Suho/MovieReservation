@@ -1,4 +1,4 @@
-package com.java.guest;
+package com.java.login;
 
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -18,7 +18,6 @@ import javax.swing.JTextField;
 
 import com.java.dao.MemberDAO;
 import com.java.dto.Member;
-import com.java.login.LoginFrame;
 import com.java.util.Time;
 
 public class MemberJoinFrame extends JFrame{
@@ -57,6 +56,11 @@ public class MemberJoinFrame extends JFrame{
 		joinIdField.setBounds(250, 100, 150, 25);
 		joinIdField.setColumns(10);
 		memberJoinPanel.add(joinIdField);
+		
+		JButton idCheckButton = new JButton("중복체크");
+		idCheckButton.setFont(new Font("맑은 고딕", Font.BOLD, 15));
+		idCheckButton.setBounds(420, 100, 100, 25);
+		memberJoinPanel.add(idCheckButton);
 		
 		JLabel joinPwdLabel = new JLabel("PW  : ");
 		joinPwdLabel.setFont(new Font("맑은 고딕", Font.BOLD, 15));
@@ -138,6 +142,19 @@ public class MemberJoinFrame extends JFrame{
 		memberJoinButton.setBounds(200, 450, 200, 30);
 		memberJoinPanel.add(memberJoinButton);
 		
+		idCheckButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MemberDAO dao = MemberDAO.getInstance();
+				int result = dao.findByUserId(joinIdField.getText());
+				if (1 == result) {
+					JOptionPane.showMessageDialog(null,"회원 아이디가 중복되었습니다.");
+				} else {
+					JOptionPane.showMessageDialog(null,"사용 가능한 아이디입니다.");
+				}
+			}
+		});
 		memberJoinButton.addActionListener(new ActionListener() {
 			
 			@Override

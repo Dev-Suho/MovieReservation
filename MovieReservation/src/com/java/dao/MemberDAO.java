@@ -26,7 +26,7 @@ public class MemberDAO {
 			System.out.println(id);
 			System.out.println(pwd);
 			try {
-				pstmt = con.prepareStatement("select * from mr_member where id = ? and pwd = ?");
+				pstmt = con.prepareStatement("select * from mr_member where BINARY(id) = ? and pwd = ?");
 				
 				pstmt.setString(1, id);
 				pstmt.setString(2, pwd);
@@ -130,6 +130,79 @@ public class MemberDAO {
 			memberName.add("CREATE_DATE");
 			
 			return memberName;
+		}
+		
+		public String searchId(String name, String birth, String tel) {
+			con = DBConnection.getConnection();
+			
+			try {
+				pstmt = con.prepareStatement("select * from mr_member where name = ? and birth = ? and tel = ?");
+				
+				pstmt.setString(1, name);
+				pstmt.setString(2, birth);
+				pstmt.setString(3, tel);
+				
+				rs = pstmt.executeQuery();
+				
+				if(rs.next()) {
+					if(rs.getString("name").equals(name) && rs.getString("birth").equals(birth) && rs.getString("tel").equals(tel)) {
+						String id = rs.getString("id");
+						return id;
+					}
+					else {
+						return null;
+					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+		
+		public String searchPwd(String id, String name, String tel) {
+			con = DBConnection.getConnection();
+			
+			try {
+				pstmt = con.prepareStatement("select * from mr_member where id = ? and name = ? and tel = ?");
+				
+				pstmt.setString(1, id);
+				pstmt.setString(2, name);
+				pstmt.setString(3, tel);
+				
+				rs = pstmt.executeQuery();
+				
+				if(rs.next()) {
+					if(rs.getString("id").equals(id) && rs.getString("name").equals(name) && rs.getString("tel").equals(tel)) {
+						String pwd = rs.getString("pwd");
+						return pwd;
+					}
+					else {
+						return null;
+					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+		
+		public int findByUserId(String id) {
+			con = DBConnection.getConnection();
+			
+			try {
+				pstmt = con.prepareStatement("select * from mr_member where id = ?");
+				
+				pstmt.setString(1, id);
+				
+				rs = pstmt.executeQuery();
+				
+				if(rs.next()) {
+					return 1;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return -1;	// 로그인 실패
 		}
 }
 
