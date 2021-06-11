@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.PreparedStatement;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -17,7 +18,7 @@ import javax.swing.JTextField;
 
 import com.java.admin.AdminFrame;
 import com.java.dao.MemberDAO;
-import com.java.guest.MemberJoinFrame;
+import com.java.dao.MemberInfoDAO;
 import com.java.guest.StartFrame;
 
 public class LoginFrame extends JFrame {
@@ -104,7 +105,7 @@ public class LoginFrame extends JFrame {
 				int result = dao.findByUsernameAndPassword(id, pw);
 				if(result == 1) {
 					frame.dispose();
-					StartFrame frame = new StartFrame();
+					StartFrame frame = new StartFrame(id);
 				}
 				else if (result == 2) {
 					frame.dispose();
@@ -127,6 +128,24 @@ public class LoginFrame extends JFrame {
 			}
 		});
 		
+		IdSearchButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				IdSearchFrame frame = new IdSearchFrame();
+			}
+			
+		});
+		
+		pwdSearchButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				PwdSearchFrame frame = new PwdSearchFrame();
+			}
+		});
 	}
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {

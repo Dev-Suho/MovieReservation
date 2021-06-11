@@ -45,17 +45,6 @@ public class MemberManagementFrame extends JFrame {
 		frame.getContentPane().setLayout(null);		
 		frame.setVisible(true);
 		
-		/*
-		if (id == null) {
-			JOptionPane.showMessageDialog(null, "인증되지 않은 사용자입니다");
-			dispose();
-			frame.dispose();
-		}
-		else {
-			frame.setVisible(true);
-		}
-		*/
-		
 		JPanel memberManagementPanel = new JPanel();
 		memberManagementPanel.setBounds(0, 0, 1196, 672);
 		frame.getContentPane().add(memberManagementPanel);
@@ -98,7 +87,6 @@ public class MemberManagementFrame extends JFrame {
 		
 		JTable memberTable = new JTable(tableModel);
 		memberTable.setFont(new Font("맑은 고딕", Font.BOLD, 13));
-		memberTable.setBounds(100, 100, 800, 400);
 		memberManagementPanel.add(memberTable, BorderLayout.CENTER);
 		
 		JScrollPane scrollPane = new JScrollPane(memberTable);

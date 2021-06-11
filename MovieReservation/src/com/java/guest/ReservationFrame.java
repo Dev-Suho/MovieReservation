@@ -1,23 +1,36 @@
 package com.java.guest;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Vector;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
+
+import com.java.dao.MovieDAO;
+import com.java.dto.Movie;
 
 public class ReservationFrame extends JFrame {
 
 	private JFrame frame;
+	private DefaultTableModel tableModel;
+	private String id;
 	
-	public ReservationFrame() {
+	public ReservationFrame() {}
+	
+	public ReservationFrame(String id) {
 		frame = new JFrame();
 		frame.setTitle("영화 예매 프로그램");
 		frame.setSize(1000, 600);	
@@ -31,48 +44,75 @@ public class ReservationFrame extends JFrame {
 		rsvPanel.setBounds(0, 0, 996, 572);
 		frame.getContentPane().add(rsvPanel);
 		rsvPanel.setBackground(Color.lightGray);
-		rsvPanel.setLayout(null);
+		rsvPanel.setLayout(new BorderLayout(0,0));
 		
-		ImageIcon movieImage1 = new ImageIcon("images/비와 당신의 이야기.jpg");
-		ImageIcon movieImage2 = new ImageIcon("images/미나리.jpg");
-		ImageIcon movieImage3 = new ImageIcon("images/분노의 질주.jpg");
+		JPanel southPanel = new JPanel(new GridLayout(1, 2));
+		JButton beforeFrameButton = new JButton("이전화면");
+		JButton nextReserveButton = new JButton("영화 선택");
+		southPanel.add(beforeFrameButton);
+		southPanel.add(nextReserveButton);
+		beforeFrameButton.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+		nextReserveButton.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+		rsvPanel.add(southPanel, BorderLayout.SOUTH);
 		
+		MovieDAO dao = MovieDAO.getInstance();
+		Vector<String> movieList = dao.getMovieReserveList();
+		Vector<Movie> movies = dao.findByAllMovie();
 		
-		JButton beforeRsvButton = new JButton("이전화면");
-		beforeRsvButton.setFont(new Font("맑은 고딕", Font.BOLD, 15));
-		beforeRsvButton.setBounds(30, 500, 100, 30);
-		rsvPanel.add(beforeRsvButton);
+		tableModel = new DefaultTableModel(movieList, 0);
 		
-		JButton nextRsvButton = new JButton("선택완료");
-		nextRsvButton.setFont(new Font("맑은 고딕", Font.BOLD, 15));
-		nextRsvButton.setBounds(830, 500, 100, 30);
-		rsvPanel.add(nextRsvButton);
+		for (int i = 0; i < movies.size(); i++) {
+			Vector<Object> row = new Vector<>();
+			
+			row.addElement(movies.get(i).getM_name());
+			row.addElement(movies.get(i).getM_theater());
+			row.addElement(movies.get(i).getM_startDay());
+			row.addElement(movies.get(i).getM_startTime());
+			row.addElement(movies.get(i).getM_runningTime());
+			row.addElement(movies.get(i).getM_price());
+			row.addElement(movies.get(i).getM_poster());
+			tableModel.addRow(row);
+		}
 		
-		JLabel rsvLabel = new JLabel("예매");
+		JTable movieTable = new JTable(tableModel);
+		movieTable.setFont(new Font("맑은 고딕", Font.BOLD, 13));
+		movieTable.setBounds(100, 100, 800, 400);
+		rsvPanel.add(movieTable, BorderLayout.CENTER);
+		
+		JScrollPane scrollPane = new JScrollPane(movieTable);
+		rsvPanel.add(scrollPane, BorderLayout.CENTER);
+		
+		JLabel rsvLabel = new JLabel("영화 목록");
 		rsvLabel.setFont(new Font("맑은 고딕", Font.BOLD, 20));
-		rsvLabel.setBounds(500,30, 40, 25);
-		rsvPanel.add(rsvLabel);
+		rsvLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		rsvLabel.setPreferredSize(new Dimension(100, 40));
+		rsvPanel.add(rsvLabel, BorderLayout.NORTH);
 		
-		JTable movieListTable = new JTable();
-		movieListTable.setFont(new Font("맑은 고딕", Font.BOLD, 13));
-		movieListTable.setBounds(100, 70, 800, 400);
-		rsvPanel.add(movieListTable);
-		
-		beforeRsvButton.addActionListener(new ActionListener() {
+		beforeFrameButton.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				frame.dispose();
-				StartFrame frame = new StartFrame();
+				StartFrame frame = new StartFrame(id);
 			}
 		});
 		
-		nextRsvButton.addActionListener(new ActionListener() {
+		nextReserveButton.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				int row = movieTable.getSelectedRow();
+				if(row < 0) {
+					row = movieTable.getRowCount()-1;
+				}
+				String m_name = (String)movieTable.getValueAt(row, 0);
+				String m_theater = (String)movieTable.getValueAt(row, 1);
+				String m_startDay = (String)movieTable.getValueAt(row, 2);
+				String m_startTime = (String)movieTable.getValueAt(row, 3);
+				int m_price = (Integer)movieTable.getValueAt(row, 5);
+				String m_poster = (String)movieTable.getValueAt(row, 6);
 				frame.dispose();
-				ChoiceSeatFrame frame = new ChoiceSeatFrame();
+				ChoiceSeatFrame frame = new ChoiceSeatFrame(id,m_name,m_theater,m_startDay,m_startTime,m_price,m_poster);
 			}
 		});
 	}
